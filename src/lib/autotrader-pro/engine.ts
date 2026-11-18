@@ -71,11 +71,11 @@ export interface ScanResult {
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
 const MIN_PERF_TRADES = 15;
 
-/** UTC session windows used by the scalping session filter. */
+/** UTC session windows used by the trading session filter. */
 export function sessionOpen(s: EngineSettings["sessions"], now: number) {
   const h = new Date(now).getUTCHours();
   const open = (s.asia && (h >= 23 || h < 8)) || (s.london && h >= 7 && h < 16) || (s.newYork && h >= 12 && h < 21);
-  return { ok: open, note: open ? undefined : "Outside the configured scalping sessions (Asia 23–08, London 07–16, New York 12–21 UTC)" };
+  return { ok: open, note: open ? undefined : "Outside the configured trading sessions (Asia 23–08, London 07–16, New York 12–21 UTC)" };
 }
 
 /** Composite score 0–100. Explicitly not a probability of winning. */

@@ -12,7 +12,6 @@ export interface SymbolConfig {
   platform: string;   // MT4
   allowed: boolean;
   trades?: string;    // how many trades to fire per signal
-  mode?: "normal" | "scalp"; // scalp = Profit Sniper quick 1R target
 }
 
 

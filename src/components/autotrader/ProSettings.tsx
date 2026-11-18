@@ -68,7 +68,7 @@ export function ProSettings() {
         </div>
       </Panel>
 
-      <Panel title="Scalping sessions (UTC)">
+      <Panel title="Trading sessions (UTC)">
         <Toggle label="Asia 23:00–08:00" checked={e.sessions.asia} onChange={(v) => proActions.setEngine({ sessions: { ...e.sessions, asia: v } })} />
         <Toggle label="London 07:00–16:00" checked={e.sessions.london} onChange={(v) => proActions.setEngine({ sessions: { ...e.sessions, london: v } })} />
         <Toggle label="New York 12:00–21:00" checked={e.sessions.newYork} onChange={(v) => proActions.setEngine({ sessions: { ...e.sessions, newYork: v } })} />

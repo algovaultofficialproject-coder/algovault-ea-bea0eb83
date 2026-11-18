@@ -9,7 +9,6 @@ import { tradeLog } from "@/lib/trade-log";
 import { usePortalStore } from "@/lib/portal-store";
 import { emailSignal } from "@/lib/signal-email.functions";
 import { scanProSignal, type CandlesFn } from "@/lib/autotrader-pro/pro-signal";
-import { pairMode, scalpTarget } from "@/lib/autotrader-pro/scalp-mode";
 import { loadRobotProState } from "@/lib/autotrader-pro/shared-config-client";
 
 interface Opts {
@@ -37,7 +36,7 @@ export function useAutoScalp({ eaId, eaName, login, password, server, enabled }:
   const calendar = useServerFn(getMarketCalendar);
   const { eas, activatedEmail } = usePortalStore();
   const symbols = (eas.find((e) => e.id === eaId)?.symbols ?? []).filter((s) => s.allowed);
-  const key = JSON.stringify(symbols.map((s) => [s.symbol, s.lotSize, s.trades, s.action, s.platform, s.mode]));
+  const key = JSON.stringify(symbols.map((s) => [s.symbol, s.lotSize, s.trades, s.action, s.platform]));
 
   useEffect(() => {
     if (!enabled || !eaId || symbols.length === 0) return;
@@ -95,8 +94,7 @@ export function useAutoScalp({ eaId, eaName, login, password, server, enabled }:
           if (dir !== "BOTH" && dir !== side) continue; // pair set to one direction only
           const digits = /JPY/i.test(s.symbol) ? 3 : /XAU|GOLD|XAG|US30|NAS|SPX|GER|UK|BTC|ETH/i.test(s.symbol) ? 2 : 5;
           const round = (n: number) => +n.toFixed(digits);
-          const scalp = pairMode(s.mode) === "scalp";
-          const price = round(sig.entry), sl = round(sig.stopLoss), tp = round(scalp ? scalpTarget(side, sig.entry, sig.stopLoss, sig.takeProfit) : sig.takeProfit);
+          const price = round(sig.entry), sl = round(sig.stopLoss), tp = round(sig.takeProfit);
           const slDist = Math.abs(price - sl), tpDist = Math.abs(tp - price);
           if (![sl, tp, slDist, tpDist].every((n) => Number.isFinite(n) && n > 0) || (side === "BUY" ? !(sl < price && price < tp) : !(tp < price && price < sl))) continue;
           const lot = Math.max(0.01, Number(s.lotSize) || 0.01);
@@ -106,7 +104,7 @@ export function useAutoScalp({ eaId, eaName, login, password, server, enabled }:
           const shownTp = tp;
           if (activatedEmail) void mail({ data: { to: activatedEmail, symbol: s.symbol, side, entry: price, sl, tp: shownTp, confidence: sig.confidence, reasons: [sig.reason] } }).catch(() => undefined);
           if (!canExecute()) return;
-          const id = tradeLog.signal({ side, symbol: s.symbol, sl, tp: shownTp, entry: price, confidence: sig.confidence, strategy: `AutoTrader Pro${scalp ? " · Profit Sniper scalp" : ""} · ${sig.strategy}`, reason: sig.reason.slice(0, 300), mode: "live" });
+          const id = tradeLog.signal({ side, symbol: s.symbol, sl, tp: shownTp, entry: price, confidence: sig.confidence, strategy: `AutoTrader Pro · ${sig.strategy}`, reason: sig.reason.slice(0, 300), mode: "live" });
           if (!login || !password || !server) { tradeLog.executed(id, 0, count, "No MetaTrader account connected"); continue; }
           try {
             let done = 0, okAny = false, err: string | undefined;

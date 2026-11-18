@@ -541,7 +541,6 @@ function PairsView({ eaId, onBack }: { eaId: string; onBack: () => void }) {
                 <span className={`${pill} ${pillOff}`}>{s.lotSize || "0.01"} lots</span>
                 <span className={`${pill} ${dir === "BOTH" ? pillOff : pillOn}`}>{dir}</span>
                 <span className={`${pill} ${pillOff}`}>{s.trades || "1"} trades</span>
-                <span className={`${pill} ${s.mode === "scalp" ? pillOn : pillOff}`}>{s.mode === "scalp" ? "Scalp" : "Normal"}</span>
                 <button onClick={() => setEditing(s.symbol)}
                   className={`${pill} ml-auto border-primary text-primary bg-card`}>
                   Configure <ArrowRight className="size-3" />
@@ -564,10 +563,9 @@ function SymbolConfigForm({ eaId, sym, onBack }: { eaId: string; sym: SymbolConf
   const [action, setAction] = useState((sym.action || "BOTH").toUpperCase());
   const [trades, setTrades] = useState(sym.trades || "1");
   const [platform, setPlatform] = useState<"MT4" | "MT5">(String(sym.platform).toUpperCase() === "MT5" ? "MT5" : "MT4");
-  const [mode, setMode] = useState<"normal" | "scalp">(sym.mode === "scalp" ? "scalp" : "normal");
 
   function save() {
-    portalActions.updateSymbol(eaId, sym.symbol, { lotSize, action, trades, platform, mode, allowed: true });
+    portalActions.updateSymbol(eaId, sym.symbol, { lotSize, action, trades, platform, allowed: true });
     onBack();
   }
   const step = (d: number) => setLotSize(fmtLot((parseFloat(lotSize) || 0) + d));
@@ -649,17 +647,6 @@ function SymbolConfigForm({ eaId, sym, onBack }: { eaId: string; sym: SymbolConf
               <button key={a} onClick={() => setAction(a)} className={seg(action === a)}>{a}</button>
             ))}
           </div>
-        </section>
-
-        <section className="rounded-3xl border border-primary/30 bg-card/90 backdrop-blur-md p-4">
-          <p className={label}>Trading mode</p>
-          <div className="mt-2 flex rounded-full border border-primary/25 bg-card/90 backdrop-blur-md p-1">
-            <button onClick={() => setMode("normal")} className={seg(mode === "normal")}>NORMAL</button>
-            <button onClick={() => setMode("scalp")} className={seg(mode === "scalp")}>SCALP</button>
-          </div>
-          <p className="mt-2 text-[11px] text-muted-foreground">
-            {mode === "scalp" ? "Profit Sniper: same safe stop, quicker take profit (about 1× the stop)." : "Full AutoTrader Pro target, as before."}
-          </p>
         </section>
 
         <Button onClick={save} className="w-full h-14 rounded-full bg-primary text-primary-foreground font-display font-extrabold tracking-widest shadow-[0_0_28px_-6px_var(--primary)]">

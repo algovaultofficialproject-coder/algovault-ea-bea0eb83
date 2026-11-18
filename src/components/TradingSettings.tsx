@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import {
   CalendarClock, Check, ChevronDown, ChevronRight, Settings2, Circle, Film, LayoutGrid, LineChart, Palette,
-  LockKeyhole, PanelBottom, RectangleHorizontal, Sparkle, Type, X, MonitorSmartphone, ListChecks, RotateCcw,
+  LockKeyhole, PanelBottom, TrendingUp, RectangleHorizontal, Sparkle, Type, X, MonitorSmartphone, ListChecks, RotateCcw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
+import { growthPlan } from "@/lib/autotrader-pro/small-account";
+import { smallAccount, useSmallAccount } from "@/lib/small-account-prefs";
 import { MAIN_INTERFACES, THEMES, UI_FONTS, portalActions, usePortalStore } from "@/lib/portal-store";
 import { CHECKLIST_ITEMS, TEXT_SIZES, profileShapeForInterface, shapesForInterface, tradingPrefs, useTradingPrefs, type BackAnimId, type NavStyle, type PortraitShape } from "@/lib/trading-prefs";
 
@@ -20,7 +23,7 @@ type Props = {
   hasVideo: boolean;
 };
 
-type Section = "interface" | "shape" | "colour" | "font" | "anim" | "nav" | "display" | "checklist" | "scanner";
+type Section = "interface" | "shape" | "colour" | "font" | "anim" | "nav" | "display" | "checklist" | "scanner" | "small";
 
 const COLOUR_NAMES: Record<string, string> = {
   blue: "Electric Blue", violet: "Royal Purple", green: "Emerald Green", red: "Crimson Red", orange: "Sunset Orange",
@@ -55,6 +58,7 @@ export function TradingSettings({ onClose, colour, onColour, scanner, openScanne
   const { uiFont, homeStyle } = usePortalStore();
   const shapeLocked = shapesForInterface(homeStyle).length === 1;
   const prefs = useTradingPrefs();
+  const sa = useSmallAccount();
   const [open, setOpen] = useState<Section | null>(openScanner ? "scanner" : null);
   const [closing, setClosing] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -181,10 +185,43 @@ export function TradingSettings({ onClose, colour, onColour, scanner, openScanne
             <button type="button" className="settings-pill settings-reset" onClick={() => tradingPrefs.resetChecklist()}><RotateCcw className="size-4" /> Reset for next trade</button>
           </Row>
 
+          <Row icon={<TrendingUp />} label="Small Account Growth" open={open === "small"} onClick={() => toggle("small")}>
+            <SmallAccountPanel sa={sa} />
+          </Row>
+
           <Row icon={<CalendarClock />} label="Fundamentals" chevron onClick={() => { close(); onFundamentals(); }} />
         </div>
       </div>
     </div>
+  );
+}
+
+function SmallAccountPanel({ sa }: { sa: ReturnType<typeof useSmallAccount> }) {
+  const bal = Number(sa.balance) || 0;
+  const plan = growthPlan(bal, sa.currency);
+  const sym = sa.currency === "ZAR" ? "R" : "$";
+  return (
+    <>
+      <ToggleCard emoji="🌱" label="Grow a small account" sub="Robot sizes lots from your balance and only takes top-quality momentum signals" on={sa.on} onToggle={() => smallAccount.set({ on: !sa.on })} />
+      <p className="settings-sub-label">Account balance</p>
+      <div className="flex items-center gap-2">
+        <div className="settings-pill-group" role="radiogroup" aria-label="Currency">
+          {(["ZAR", "USD"] as const).map((c) => (
+            <button key={c} type="button" role="radio" aria-checked={sa.currency === c} className={`settings-pill ${sa.currency === c ? "is-on" : ""}`} onClick={() => smallAccount.set({ currency: c })}>{c === "ZAR" ? "R" : "$"}</button>
+          ))}
+        </div>
+        <Input inputMode="decimal" aria-label="Account balance" value={sa.balance} onChange={(e) => smallAccount.set({ balance: e.target.value.replace(/[^0-9.]/g, "") })} />
+      </div>
+      <ToggleCard emoji="🪙" label="Cent account" sub="Turn on if your broker account is a cent account (best for balances under R1 000)" on={sa.cent} onToggle={() => smallAccount.set({ cent: !sa.cent })} />
+      {bal > 0 && (
+        <div className="settings-check-progress">
+          <span>{plan.tier.name} tier · risk {plan.tier.riskPct}% · up to {plan.tier.maxTrades} trade{plan.tier.maxTrades > 1 ? "s" : ""} · {plan.tier.minGrade}+ signals only</span>
+          <span>Next goal {sym}{plan.target.toLocaleString()}{plan.next ? ` (${plan.next.name})` : " (double up)"}</span>
+          <span className="settings-check-bar"><span style={{ width: `${plan.progress * 100}%` }} /></span>
+        </div>
+      )}
+      <p className="settings-sub-label">Update your balance as it grows so the robot moves up a tier. Your pair lot stays the maximum. Profits are never guaranteed.</p>
+    </>
   );
 }
 

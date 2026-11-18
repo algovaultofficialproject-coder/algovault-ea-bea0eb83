@@ -9,6 +9,8 @@ import { tradeLog } from "@/lib/trade-log";
 import { usePortalStore } from "@/lib/portal-store";
 import { emailSignal } from "@/lib/signal-email.functions";
 import { scanProSignal, type CandlesFn } from "@/lib/autotrader-pro/pro-signal";
+import { sizeSmallAccount } from "@/lib/autotrader-pro/small-account";
+import { smallAccount } from "@/lib/small-account-prefs";
 import { loadRobotProState } from "@/lib/autotrader-pro/shared-config-client";
 
 interface Opts {
@@ -97,14 +99,31 @@ export function useAutoScalp({ eaId, eaName, login, password, server, enabled }:
           const price = round(sig.entry), sl = round(sig.stopLoss), tp = round(sig.takeProfit);
           const slDist = Math.abs(price - sl), tpDist = Math.abs(tp - price);
           if (![sl, tp, slDist, tpDist].every((n) => Number.isFinite(n) && n > 0) || (side === "BUY" ? !(sl < price && price < tp) : !(tp < price && price < sl))) continue;
-          const lot = Math.max(0.01, Number(s.lotSize) || 0.01);
-          const count = Math.max(1, Math.min(20, parseInt(String(s.trades ?? "1"), 10) || 1));
+          let lot = Math.max(0.01, Number(s.lotSize) || 0.01);
+          let count = Math.max(1, Math.min(20, parseInt(String(s.trades ?? "1"), 10) || 1));
+          let reason = sig.reason;
+          // Small Account Growth (opt-in): lot and trade count from the typed balance, only the tier's signal grade.
+          const sa = smallAccount.get();
+          if (sa.on) {
+            const r = sizeSmallAccount({ symbol: s.symbol, entry: price, stop: sl, balance: Number(sa.balance) || 0, currency: sa.currency, cent: sa.cent, pairLot: lot, pairTrades: count, grade: sig.grade });
+            if (!r.ok) {
+              const why = `Small account (${r.tier.name}): ${r.reason}`;
+              const last = waitLogged.get(s.symbol);
+              if (!last || last.reason !== why || Date.now() - last.at >= WAIT_RELOG_MS) {
+                waitLogged.set(s.symbol, { at: Date.now(), reason: why });
+                tradeLog.wait({ symbol: s.symbol, reason: why });
+                tradeLog.scanning();
+              }
+              continue;
+            }
+            lot = r.lot; count = r.trades; reason = `${r.note} · ${reason}`;
+          }
           // One stop loss and one take profit for every trade: the AutoTrader Pro market-based plan.
           const groups = [{ count, tpDist }];
           const shownTp = tp;
-          if (activatedEmail) void mail({ data: { to: activatedEmail, symbol: s.symbol, side, entry: price, sl, tp: shownTp, confidence: sig.confidence, reasons: [sig.reason] } }).catch(() => undefined);
+          if (activatedEmail) void mail({ data: { to: activatedEmail, symbol: s.symbol, side, entry: price, sl, tp: shownTp, confidence: sig.confidence, reasons: [reason] } }).catch(() => undefined);
           if (!canExecute()) return;
-          const id = tradeLog.signal({ side, symbol: s.symbol, sl, tp: shownTp, entry: price, confidence: sig.confidence, strategy: `AutoTrader Pro · ${sig.strategy}`, reason: sig.reason.slice(0, 300), mode: "live" });
+          const id = tradeLog.signal({ side, symbol: s.symbol, sl, tp: shownTp, entry: price, confidence: sig.confidence, strategy: `AutoTrader Pro · ${sig.strategy}${sig.grade ? ` · Grade ${sig.grade}` : ""}`, reason: reason.slice(0, 300), mode: "live" });
           if (!login || !password || !server) { tradeLog.executed(id, 0, count, "No MetaTrader account connected"); continue; }
           try {
             let done = 0, okAny = false, err: string | undefined;

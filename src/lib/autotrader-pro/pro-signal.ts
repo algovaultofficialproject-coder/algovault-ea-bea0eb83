@@ -14,6 +14,7 @@ import { planTpSl, tpslFor, type TpSlPlan } from "./tpsl";
 import type { FrameSmc } from "./mtf";
 import { refereeAction, type GeminiVerdict } from "./gemini-referee";
 import { bookMode, isBreakout } from "./strategy-book";
+import { momentumQuality, readMomentum, type MomentumRead, type QualityGrade } from "./momentum";
 
 /** Pure: apply the TP/SL engine to a directional decision: structure + ATR stop and one average structure-based target. */
 import { DEFAULT_TARGET_RR, MAX_TARGET_RR, MIN_TARGET_RR } from "./target-band";
@@ -55,7 +56,7 @@ export function withTpSl(sig: ProSignal, plan: TpSlPlan | undefined): ProSignal 
 }
 
 export type ProSignal =
-  | { ok: true; side: Side; id: string; interval: Interval; entry: number; stopLoss: number; takeProfit: number; confidence: number; strategy: string; reason: string; confirmed?: boolean; mode?: "trend" | "range" | "transition"; breakout?: boolean }
+  | { ok: true; side: Side; id: string; interval: Interval; entry: number; stopLoss: number; takeProfit: number; confidence: number; strategy: string; reason: string; confirmed?: boolean; mode?: "trend" | "range" | "transition"; breakout?: boolean; grade?: QualityGrade; momentum?: string }
   | { ok: true; side: "WAIT"; reason: string }
   | { ok: false; error: string };
 
@@ -136,8 +137,8 @@ export async function scanProSignal(symbol: string, candlesFn: CandlesFn, now = 
       ctx: { spreadAtr: feed.spread !== undefined && atrNow > 0 ? feed.spread / atrNow : undefined },
     });
     const smc: FrameSmc = { interval, smc: readSmc(series, i), price: feed.candles[i].c, atr: atrNow, volatility: result.market.volatility };
-    return { interval, result, smc, spread: feed.spread };
-  }))).filter((f): f is { interval: Interval; result: ScanResult; smc: FrameSmc; spread: number | undefined } => !!f);
+    return { interval, result, smc, spread: feed.spread, momentum: readMomentum(series, i, interval) };
+  }))).filter((f): f is { interval: Interval; result: ScanResult; smc: FrameSmc; spread: number | undefined; momentum: MomentumRead } => !!f);
   if (frames.length === 0) return { ok: false, error: lastError };
   const chosen = pickTimeframe(frames);
   const sig = proDecision(chosen, frames);
@@ -148,7 +149,16 @@ export async function scanProSignal(symbol: string, candlesFn: CandlesFn, now = 
   // The trading-app robot follows AutoTrader Pro: Gemini can only add confidence when it agrees, never turn a Pro signal into WAIT.
   if (sig.side === "WAIT") return sig;
   const out = act === "agree" && verdict ? { ...sig, confidence: Math.min(95, sig.confidence + 5), reason: `${sig.reason} · Gemini agrees: ${verdict.reason}` } : sig;
-  return withTpSl(out, plan(out.side, out.entry));
+  return withMomentum(withTpSl(out, plan(out.side, out.entry)), frames.map((f) => f.momentum));
+}
+
+/** Pure: grade a signal by current momentum and next-shift risk (A+…C), adjusting confidence and explaining why. */
+export function withMomentum(sig: ProSignal, reads: MomentumRead[]): ProSignal {
+  if (!sig.ok || sig.side === "WAIT" || reads.length === 0) return sig;
+  const q = momentumQuality(sig.side, reads);
+  const momentum = reads.map((r) => r.text).join(" · ");
+  const confidence = Math.max(5, Math.min(95, sig.confidence + q.delta));
+  return { ...sig, confidence, grade: q.grade, momentum, reason: `${sig.reason} · Quality ${q.grade}${q.notes.length ? `: ${q.notes.join("; ")}` : ""}` };
 }
 
 /** Minimal chart-scanner signal shape shared by uploaded-chart and live scans. */

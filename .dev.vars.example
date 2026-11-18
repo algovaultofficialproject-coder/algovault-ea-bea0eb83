@@ -1,0 +1,23 @@
+# Names only — never commit real values. Copy to .dev.vars (git-ignored) for local Cloudflare tests,
+# and add the same names in Cloudflare Pages → Settings → Variables and Secrets.
+
+# Public (safe in the browser; also read at build time)
+VITE_SUPABASE_URL=
+VITE_SUPABASE_PUBLISHABLE_KEY=
+VITE_SUPABASE_PROJECT_ID=
+
+# Server-only (set as Variables)
+SUPABASE_URL=
+SUPABASE_PUBLISHABLE_KEY=
+
+# Server-only (set as encrypted Secrets)
+SUPABASE_SERVICE_ROLE_KEY=
+LOVABLE_API_KEY=
+METAAPI_TOKEN=
+METAAPI_REGION=
+MTAPI_KEY=
+METATRADERAPI_CLOUD_API_KEY=
+FASTFOREX_API_KEY=
+BRIDGE_API_KEY=
+TWELVE_DATA_API_KEY=
+PORTAL_ADMIN_PASSWORD=

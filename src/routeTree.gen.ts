@@ -10,33 +10,460 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as ActivateRouteImport } from './routes/activate'
+import { Route as AndroidRouteImport } from './routes/android'
+import { Route as AutotraderRouteImport } from './routes/autotrader'
+import { Route as BotEditorRouteImport } from './routes/bot-editor'
+import { Route as BridgeKeysRouteImport } from './routes/bridge-keys'
+import { Route as BrokerRouteImport } from './routes/broker'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as EaAppRouteImport } from './routes/ea-app'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as FundamentalsRouteImport } from './routes/fundamentals'
+import { Route as GenerateKeyRouteImport } from './routes/generate-key'
+import { Route as IosRouteImport } from './routes/ios'
+import { Route as KeyStatsRouteImport } from './routes/key-stats'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ManageEasRouteImport } from './routes/manage-eas'
+import { Route as NdmemailRouteImport } from './routes/ndmemail'
+import { Route as PaymentNumberRouteImport } from './routes/payment-number'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PromoSiteRouteImport } from './routes/promo-site'
+import { Route as ReactivateRouteImport } from './routes/reactivate'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SignalsRouteImport } from './routes/signals'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as UploadAppRouteImport } from './routes/upload-app'
+import { Route as UsersRouteImport } from './routes/users'
+import { Route as BotEditorEaIdRouteImport } from './routes/bot-editor_.$eaId'
+import { Route as ManageEasEaIdRouteImport } from './routes/manage-eas.$eaId'
+import { Route as RobotEaIdRouteImport } from './routes/robot.$eaId'
+import { Route as SiteSlugRouteImport } from './routes/site.$slug'
+import { Route as AuthenticatedDevMtapiTestRouteImport } from './routes/_authenticated.dev.mtapi-test'
+import { Route as ApiPublicSignalRouteImport } from './routes/api/public/signal'
+import { Route as ApiPublicBridgeSplatRouteImport } from './routes/api/public/bridge.$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ActivateRoute = ActivateRouteImport.update({
+  id: '/activate',
+  path: '/activate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AndroidRoute = AndroidRouteImport.update({
+  id: '/android',
+  path: '/android',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AutotraderRoute = AutotraderRouteImport.update({
+  id: '/autotrader',
+  path: '/autotrader',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BotEditorRoute = BotEditorRouteImport.update({
+  id: '/bot-editor',
+  path: '/bot-editor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BridgeKeysRoute = BridgeKeysRouteImport.update({
+  id: '/bridge-keys',
+  path: '/bridge-keys',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BrokerRoute = BrokerRouteImport.update({
+  id: '/broker',
+  path: '/broker',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EaAppRoute = EaAppRouteImport.update({
+  id: '/ea-app',
+  path: '/ea-app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FundamentalsRoute = FundamentalsRouteImport.update({
+  id: '/fundamentals',
+  path: '/fundamentals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GenerateKeyRoute = GenerateKeyRouteImport.update({
+  id: '/generate-key',
+  path: '/generate-key',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IosRoute = IosRouteImport.update({
+  id: '/ios',
+  path: '/ios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KeyStatsRoute = KeyStatsRouteImport.update({
+  id: '/key-stats',
+  path: '/key-stats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManageEasRoute = ManageEasRouteImport.update({
+  id: '/manage-eas',
+  path: '/manage-eas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NdmemailRoute = NdmemailRouteImport.update({
+  id: '/ndmemail',
+  path: '/ndmemail',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentNumberRoute = PaymentNumberRouteImport.update({
+  id: '/payment-number',
+  path: '/payment-number',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PromoSiteRoute = PromoSiteRouteImport.update({
+  id: '/promo-site',
+  path: '/promo-site',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReactivateRoute = ReactivateRouteImport.update({
+  id: '/reactivate',
+  path: '/reactivate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignalsRoute = SignalsRouteImport.update({
+  id: '/signals',
+  path: '/signals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UploadAppRoute = UploadAppRouteImport.update({
+  id: '/upload-app',
+  path: '/upload-app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UsersRoute = UsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BotEditorEaIdRoute = BotEditorEaIdRouteImport.update({
+  id: '/bot-editor_/$eaId',
+  path: '/bot-editor/$eaId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManageEasEaIdRoute = ManageEasEaIdRouteImport.update({
+  id: '/$eaId',
+  path: '/$eaId',
+  getParentRoute: () => ManageEasRoute,
+} as any)
+const RobotEaIdRoute = RobotEaIdRouteImport.update({
+  id: '/robot/$eaId',
+  path: '/robot/$eaId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SiteSlugRoute = SiteSlugRouteImport.update({
+  id: '/site/$slug',
+  path: '/site/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedDevMtapiTestRoute =
+  AuthenticatedDevMtapiTestRouteImport.update({
+    id: '/dev/mtapi-test',
+    path: '/dev/mtapi-test',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const ApiPublicSignalRoute = ApiPublicSignalRouteImport.update({
+  id: '/api/public/signal',
+  path: '/api/public/signal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicBridgeSplatRoute = ApiPublicBridgeSplatRouteImport.update({
+  id: '/api/public/bridge/$',
+  path: '/api/public/bridge/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/activate': typeof ActivateRoute
+  '/android': typeof AndroidRoute
+  '/autotrader': typeof AutotraderRoute
+  '/bot-editor': typeof BotEditorRoute
+  '/bridge-keys': typeof BridgeKeysRoute
+  '/broker': typeof BrokerRoute
+  '/dashboard': typeof DashboardRoute
+  '/ea-app': typeof EaAppRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/fundamentals': typeof FundamentalsRoute
+  '/generate-key': typeof GenerateKeyRoute
+  '/ios': typeof IosRoute
+  '/key-stats': typeof KeyStatsRoute
+  '/login': typeof LoginRoute
+  '/manage-eas': typeof ManageEasRouteWithChildren
+  '/ndmemail': typeof NdmemailRoute
+  '/payment-number': typeof PaymentNumberRoute
+  '/profile': typeof ProfileRoute
+  '/promo-site': typeof PromoSiteRoute
+  '/reactivate': typeof ReactivateRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signals': typeof SignalsRoute
+  '/signup': typeof SignupRoute
+  '/upload-app': typeof UploadAppRoute
+  '/users': typeof UsersRoute
+  '/bot-editor/$eaId': typeof BotEditorEaIdRoute
+  '/manage-eas/$eaId': typeof ManageEasEaIdRoute
+  '/robot/$eaId': typeof RobotEaIdRoute
+  '/site/$slug': typeof SiteSlugRoute
+  '/dev/mtapi-test': typeof AuthenticatedDevMtapiTestRoute
+  '/api/public/signal': typeof ApiPublicSignalRoute
+  '/api/public/bridge/$': typeof ApiPublicBridgeSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/activate': typeof ActivateRoute
+  '/android': typeof AndroidRoute
+  '/autotrader': typeof AutotraderRoute
+  '/bot-editor': typeof BotEditorRoute
+  '/bridge-keys': typeof BridgeKeysRoute
+  '/broker': typeof BrokerRoute
+  '/dashboard': typeof DashboardRoute
+  '/ea-app': typeof EaAppRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/fundamentals': typeof FundamentalsRoute
+  '/generate-key': typeof GenerateKeyRoute
+  '/ios': typeof IosRoute
+  '/key-stats': typeof KeyStatsRoute
+  '/login': typeof LoginRoute
+  '/manage-eas': typeof ManageEasRouteWithChildren
+  '/ndmemail': typeof NdmemailRoute
+  '/payment-number': typeof PaymentNumberRoute
+  '/profile': typeof ProfileRoute
+  '/promo-site': typeof PromoSiteRoute
+  '/reactivate': typeof ReactivateRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signals': typeof SignalsRoute
+  '/signup': typeof SignupRoute
+  '/upload-app': typeof UploadAppRoute
+  '/users': typeof UsersRoute
+  '/bot-editor/$eaId': typeof BotEditorEaIdRoute
+  '/manage-eas/$eaId': typeof ManageEasEaIdRoute
+  '/robot/$eaId': typeof RobotEaIdRoute
+  '/site/$slug': typeof SiteSlugRoute
+  '/dev/mtapi-test': typeof AuthenticatedDevMtapiTestRoute
+  '/api/public/signal': typeof ApiPublicSignalRoute
+  '/api/public/bridge/$': typeof ApiPublicBridgeSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/activate': typeof ActivateRoute
+  '/android': typeof AndroidRoute
+  '/autotrader': typeof AutotraderRoute
+  '/bot-editor': typeof BotEditorRoute
+  '/bridge-keys': typeof BridgeKeysRoute
+  '/broker': typeof BrokerRoute
+  '/dashboard': typeof DashboardRoute
+  '/ea-app': typeof EaAppRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/fundamentals': typeof FundamentalsRoute
+  '/generate-key': typeof GenerateKeyRoute
+  '/ios': typeof IosRoute
+  '/key-stats': typeof KeyStatsRoute
+  '/login': typeof LoginRoute
+  '/manage-eas': typeof ManageEasRouteWithChildren
+  '/ndmemail': typeof NdmemailRoute
+  '/payment-number': typeof PaymentNumberRoute
+  '/profile': typeof ProfileRoute
+  '/promo-site': typeof PromoSiteRoute
+  '/reactivate': typeof ReactivateRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signals': typeof SignalsRoute
+  '/signup': typeof SignupRoute
+  '/upload-app': typeof UploadAppRoute
+  '/users': typeof UsersRoute
+  '/bot-editor_/$eaId': typeof BotEditorEaIdRoute
+  '/manage-eas/$eaId': typeof ManageEasEaIdRoute
+  '/robot/$eaId': typeof RobotEaIdRoute
+  '/site/$slug': typeof SiteSlugRoute
+  '/_authenticated/dev/mtapi-test': typeof AuthenticatedDevMtapiTestRoute
+  '/api/public/signal': typeof ApiPublicSignalRoute
+  '/api/public/bridge/$': typeof ApiPublicBridgeSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/activate'
+    | '/android'
+    | '/autotrader'
+    | '/bot-editor'
+    | '/bridge-keys'
+    | '/broker'
+    | '/dashboard'
+    | '/ea-app'
+    | '/forgot-password'
+    | '/fundamentals'
+    | '/generate-key'
+    | '/ios'
+    | '/key-stats'
+    | '/login'
+    | '/manage-eas'
+    | '/ndmemail'
+    | '/payment-number'
+    | '/profile'
+    | '/promo-site'
+    | '/reactivate'
+    | '/reset-password'
+    | '/signals'
+    | '/signup'
+    | '/upload-app'
+    | '/users'
+    | '/bot-editor/$eaId'
+    | '/manage-eas/$eaId'
+    | '/robot/$eaId'
+    | '/site/$slug'
+    | '/dev/mtapi-test'
+    | '/api/public/signal'
+    | '/api/public/bridge/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/activate'
+    | '/android'
+    | '/autotrader'
+    | '/bot-editor'
+    | '/bridge-keys'
+    | '/broker'
+    | '/dashboard'
+    | '/ea-app'
+    | '/forgot-password'
+    | '/fundamentals'
+    | '/generate-key'
+    | '/ios'
+    | '/key-stats'
+    | '/login'
+    | '/manage-eas'
+    | '/ndmemail'
+    | '/payment-number'
+    | '/profile'
+    | '/promo-site'
+    | '/reactivate'
+    | '/reset-password'
+    | '/signals'
+    | '/signup'
+    | '/upload-app'
+    | '/users'
+    | '/bot-editor/$eaId'
+    | '/manage-eas/$eaId'
+    | '/robot/$eaId'
+    | '/site/$slug'
+    | '/dev/mtapi-test'
+    | '/api/public/signal'
+    | '/api/public/bridge/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/activate'
+    | '/android'
+    | '/autotrader'
+    | '/bot-editor'
+    | '/bridge-keys'
+    | '/broker'
+    | '/dashboard'
+    | '/ea-app'
+    | '/forgot-password'
+    | '/fundamentals'
+    | '/generate-key'
+    | '/ios'
+    | '/key-stats'
+    | '/login'
+    | '/manage-eas'
+    | '/ndmemail'
+    | '/payment-number'
+    | '/profile'
+    | '/promo-site'
+    | '/reactivate'
+    | '/reset-password'
+    | '/signals'
+    | '/signup'
+    | '/upload-app'
+    | '/users'
+    | '/bot-editor_/$eaId'
+    | '/manage-eas/$eaId'
+    | '/robot/$eaId'
+    | '/site/$slug'
+    | '/_authenticated/dev/mtapi-test'
+    | '/api/public/signal'
+    | '/api/public/bridge/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  ActivateRoute: typeof ActivateRoute
+  AndroidRoute: typeof AndroidRoute
+  AutotraderRoute: typeof AutotraderRoute
+  BotEditorRoute: typeof BotEditorRoute
+  BridgeKeysRoute: typeof BridgeKeysRoute
+  BrokerRoute: typeof BrokerRoute
+  DashboardRoute: typeof DashboardRoute
+  EaAppRoute: typeof EaAppRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  FundamentalsRoute: typeof FundamentalsRoute
+  GenerateKeyRoute: typeof GenerateKeyRoute
+  IosRoute: typeof IosRoute
+  KeyStatsRoute: typeof KeyStatsRoute
+  LoginRoute: typeof LoginRoute
+  ManageEasRoute: typeof ManageEasRouteWithChildren
+  NdmemailRoute: typeof NdmemailRoute
+  PaymentNumberRoute: typeof PaymentNumberRoute
+  ProfileRoute: typeof ProfileRoute
+  PromoSiteRoute: typeof PromoSiteRoute
+  ReactivateRoute: typeof ReactivateRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  SignalsRoute: typeof SignalsRoute
+  SignupRoute: typeof SignupRoute
+  UploadAppRoute: typeof UploadAppRoute
+  UsersRoute: typeof UsersRoute
+  BotEditorEaIdRoute: typeof BotEditorEaIdRoute
+  RobotEaIdRoute: typeof RobotEaIdRoute
+  SiteSlugRoute: typeof SiteSlugRoute
+  ApiPublicSignalRoute: typeof ApiPublicSignalRoute
+  ApiPublicBridgeSplatRoute: typeof ApiPublicBridgeSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +475,296 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/activate': {
+      id: '/activate'
+      path: '/activate'
+      fullPath: '/activate'
+      preLoaderRoute: typeof ActivateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/android': {
+      id: '/android'
+      path: '/android'
+      fullPath: '/android'
+      preLoaderRoute: typeof AndroidRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/autotrader': {
+      id: '/autotrader'
+      path: '/autotrader'
+      fullPath: '/autotrader'
+      preLoaderRoute: typeof AutotraderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bot-editor': {
+      id: '/bot-editor'
+      path: '/bot-editor'
+      fullPath: '/bot-editor'
+      preLoaderRoute: typeof BotEditorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bridge-keys': {
+      id: '/bridge-keys'
+      path: '/bridge-keys'
+      fullPath: '/bridge-keys'
+      preLoaderRoute: typeof BridgeKeysRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/broker': {
+      id: '/broker'
+      path: '/broker'
+      fullPath: '/broker'
+      preLoaderRoute: typeof BrokerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ea-app': {
+      id: '/ea-app'
+      path: '/ea-app'
+      fullPath: '/ea-app'
+      preLoaderRoute: typeof EaAppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fundamentals': {
+      id: '/fundamentals'
+      path: '/fundamentals'
+      fullPath: '/fundamentals'
+      preLoaderRoute: typeof FundamentalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/generate-key': {
+      id: '/generate-key'
+      path: '/generate-key'
+      fullPath: '/generate-key'
+      preLoaderRoute: typeof GenerateKeyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ios': {
+      id: '/ios'
+      path: '/ios'
+      fullPath: '/ios'
+      preLoaderRoute: typeof IosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/key-stats': {
+      id: '/key-stats'
+      path: '/key-stats'
+      fullPath: '/key-stats'
+      preLoaderRoute: typeof KeyStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manage-eas': {
+      id: '/manage-eas'
+      path: '/manage-eas'
+      fullPath: '/manage-eas'
+      preLoaderRoute: typeof ManageEasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ndmemail': {
+      id: '/ndmemail'
+      path: '/ndmemail'
+      fullPath: '/ndmemail'
+      preLoaderRoute: typeof NdmemailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment-number': {
+      id: '/payment-number'
+      path: '/payment-number'
+      fullPath: '/payment-number'
+      preLoaderRoute: typeof PaymentNumberRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/promo-site': {
+      id: '/promo-site'
+      path: '/promo-site'
+      fullPath: '/promo-site'
+      preLoaderRoute: typeof PromoSiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reactivate': {
+      id: '/reactivate'
+      path: '/reactivate'
+      fullPath: '/reactivate'
+      preLoaderRoute: typeof ReactivateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signals': {
+      id: '/signals'
+      path: '/signals'
+      fullPath: '/signals'
+      preLoaderRoute: typeof SignalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/upload-app': {
+      id: '/upload-app'
+      path: '/upload-app'
+      fullPath: '/upload-app'
+      preLoaderRoute: typeof UploadAppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/users': {
+      id: '/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof UsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bot-editor_/$eaId': {
+      id: '/bot-editor_/$eaId'
+      path: '/bot-editor/$eaId'
+      fullPath: '/bot-editor/$eaId'
+      preLoaderRoute: typeof BotEditorEaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manage-eas/$eaId': {
+      id: '/manage-eas/$eaId'
+      path: '/$eaId'
+      fullPath: '/manage-eas/$eaId'
+      preLoaderRoute: typeof ManageEasEaIdRouteImport
+      parentRoute: typeof ManageEasRoute
+    }
+    '/robot/$eaId': {
+      id: '/robot/$eaId'
+      path: '/robot/$eaId'
+      fullPath: '/robot/$eaId'
+      preLoaderRoute: typeof RobotEaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/site/$slug': {
+      id: '/site/$slug'
+      path: '/site/$slug'
+      fullPath: '/site/$slug'
+      preLoaderRoute: typeof SiteSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dev/mtapi-test': {
+      id: '/_authenticated/dev/mtapi-test'
+      path: '/dev/mtapi-test'
+      fullPath: '/dev/mtapi-test'
+      preLoaderRoute: typeof AuthenticatedDevMtapiTestRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/signal': {
+      id: '/api/public/signal'
+      path: '/api/public/signal'
+      fullPath: '/api/public/signal'
+      preLoaderRoute: typeof ApiPublicSignalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/bridge/$': {
+      id: '/api/public/bridge/$'
+      path: '/api/public/bridge/$'
+      fullPath: '/api/public/bridge/$'
+      preLoaderRoute: typeof ApiPublicBridgeSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDevMtapiTestRoute: typeof AuthenticatedDevMtapiTestRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDevMtapiTestRoute: AuthenticatedDevMtapiTestRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+interface ManageEasRouteChildren {
+  ManageEasEaIdRoute: typeof ManageEasEaIdRoute
+}
+
+const ManageEasRouteChildren: ManageEasRouteChildren = {
+  ManageEasEaIdRoute: ManageEasEaIdRoute,
+}
+
+const ManageEasRouteWithChildren = ManageEasRoute._addFileChildren(
+  ManageEasRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  ActivateRoute: ActivateRoute,
+  AndroidRoute: AndroidRoute,
+  AutotraderRoute: AutotraderRoute,
+  BotEditorRoute: BotEditorRoute,
+  BridgeKeysRoute: BridgeKeysRoute,
+  BrokerRoute: BrokerRoute,
+  DashboardRoute: DashboardRoute,
+  EaAppRoute: EaAppRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  FundamentalsRoute: FundamentalsRoute,
+  GenerateKeyRoute: GenerateKeyRoute,
+  IosRoute: IosRoute,
+  KeyStatsRoute: KeyStatsRoute,
+  LoginRoute: LoginRoute,
+  ManageEasRoute: ManageEasRouteWithChildren,
+  NdmemailRoute: NdmemailRoute,
+  PaymentNumberRoute: PaymentNumberRoute,
+  ProfileRoute: ProfileRoute,
+  PromoSiteRoute: PromoSiteRoute,
+  ReactivateRoute: ReactivateRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  SignalsRoute: SignalsRoute,
+  SignupRoute: SignupRoute,
+  UploadAppRoute: UploadAppRoute,
+  UsersRoute: UsersRoute,
+  BotEditorEaIdRoute: BotEditorEaIdRoute,
+  RobotEaIdRoute: RobotEaIdRoute,
+  SiteSlugRoute: SiteSlugRoute,
+  ApiPublicSignalRoute: ApiPublicSignalRoute,
+  ApiPublicBridgeSplatRoute: ApiPublicBridgeSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

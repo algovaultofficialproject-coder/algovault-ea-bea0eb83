@@ -9,6 +9,8 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    // Framework packages must be inlined so vi.mock can intercept them in tests.
+    server: { deps: { inline: [/@tanstack\/react-start/] } },
   },
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },

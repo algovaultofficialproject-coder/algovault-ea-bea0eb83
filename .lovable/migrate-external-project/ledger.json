@@ -1,0 +1,117 @@
+{
+  "source": "code archive algovault-ea-d0648de4-main.zip (Lovable TanStack Start export of AlgoVault; previous Lovable Cloud backend; schema in drizzle migrations 0000-0006)",
+  "capabilities": [
+    {
+      "capability": "code",
+      "source": "src/, public/, android/, android-shell/, capacitor.config.ts, tests",
+      "outcome": "migrate",
+      "status": "verified",
+      "next_action": "Copied; TanStack pins identical; 450 vitest + 2 bun tests pass; typecheck clean; build OK; Android signing keystore not in archive"
+    },
+    {
+      "capability": "schema",
+      "source": "drizzle/migrations 0000-0006",
+      "outcome": "migrate",
+      "status": "verified",
+      "next_action": "Migrations 0000-0006 applied byte-for-byte; generated types identical to source; 24 tables"
+    },
+    {
+      "capability": "records",
+      "source": "previous Lovable Cloud database",
+      "outcome": "migrate",
+      "status": "pending",
+      "next_action": "Request CSV/JSON exports of application tables after preview"
+    },
+    {
+      "capability": "auth identities",
+      "source": "previous Lovable Cloud auth users",
+      "outcome": "migrate",
+      "status": "pending",
+      "next_action": "Users/profiles export needed; imported mentors set a new password via /forgot-password -> /reset-password"
+    },
+    {
+      "capability": "authorization",
+      "source": "user_roles + has_role/is_admin, RLS",
+      "outcome": "migrate",
+      "status": "in_progress",
+      "next_action": "Roles, owner auto-admin trigger and RLS recreated; imported-user and cross-user checks wait on data export"
+    },
+    {
+      "capability": "file storage",
+      "source": "app-files private bucket",
+      "outcome": "migrate",
+      "status": "in_progress",
+      "next_action": "Private app-files bucket created (200 MB limit); re-upload the latest Android file on /upload-app"
+    },
+    {
+      "capability": "static downloads",
+      "source": "public/downloads, public/ex5",
+      "outcome": "migrate",
+      "status": "verified",
+      "next_action": ".ex5 downloads return 200"
+    },
+    {
+      "capability": "image assets",
+      "source": "src/assets/*.jpg and *.asset.json CDN pointers",
+      "outcome": "migrate",
+      "status": "verified",
+      "next_action": "6 home-style images and algo-thunder.apk downloaded from algovault-ea.lovable.app and re-hosted here; sizes match; apk serves 200"
+    },
+    {
+      "capability": "AI gateway",
+      "source": "LOVABLE_API_KEY",
+      "outcome": "preserve",
+      "status": "in_progress",
+      "next_action": "LOVABLE_API_KEY provisioned with Cloud; live AI scan not exercised"
+    },
+    {
+      "capability": "email (Outlook/Gmail connectors)",
+      "source": "MICROSOFT_OUTLOOK_API_KEY, GOOGLE_MAIL_API_KEY",
+      "outcome": "preserve",
+      "status": "pending",
+      "next_action": "Link the Outlook connector (Gmail optional fallback)"
+    },
+    {
+      "capability": "trading/data provider keys",
+      "source": "METAAPI_TOKEN, METAAPI_REGION, MTAPI_KEY, METATRADERAPI_CLOUD_API_KEY, FASTFOREX_API_KEY, BRIDGE_API_KEY, TWELVE_DATA_API_KEY, PORTAL_ADMIN_PASSWORD",
+      "outcome": "preserve",
+      "status": "pending",
+      "next_action": "Request securely before live verification"
+    },
+    {
+      "capability": "public endpoints",
+      "source": "/api/public/bridge/*, /api/public/signal",
+      "outcome": "preserve",
+      "status": "verified",
+      "next_action": "/api/public/bridge/health 200; /api/public/signal 422 without payload"
+    },
+    {
+      "capability": "schedules",
+      "source": "none in archive (cron-auth helper only)",
+      "outcome": "preserve",
+      "status": "verified",
+      "next_action": "No job routes in archive; no schedule needed"
+    },
+    {
+      "capability": "auth settings",
+      "source": "email sign-in, auto-confirm, leaked-password check",
+      "outcome": "migrate",
+      "status": "verified",
+      "next_action": "Email sign-in on; auto-confirm on (source sign-up returns a session instantly); leaked-password check on"
+    },
+    {
+      "capability": "cutover",
+      "source": "EA bot server URLs, capacitor.config.ts server URL",
+      "outcome": "migrate",
+      "status": "pending",
+      "next_action": "After publish, point EAs/bridge and Android shell at the new address"
+    },
+    {
+      "capability": "verification",
+      "source": "-",
+      "outcome": "migrate",
+      "status": "in_progress",
+      "next_action": "Home, login, signup, signals, forgot-password, activate, promo-site load; sign-up -> dashboard with database Mentor ID verified; test account removed. Imported-user login, email and live providers pending"
+    }
+  ]
+}

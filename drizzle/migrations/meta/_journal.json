@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1795031795318,
+      "tag": "0000_recreate_algovault_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795031827633,
+      "tag": "0001_mentor_ids_promo_sites",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795031836056,
+      "tag": "0002_create_guard_accounts",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1795031842844,
+      "tag": "0003_promo_phone_interface",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795031852142,
+      "tag": "0004_chart_scan_usage",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795031860959,
+      "tag": "0005_gemini_keys_and_verdicts",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795031867329,
+      "tag": "0006_app_access_days_and_phone_sessions",
+      "breakpoints": true
+    }
+  ]
+}

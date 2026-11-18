@@ -1,0 +1,2 @@
+- Builds sign with keystore/algovault-dev.keystore so each new APK installs over the previous one.
+- Bump versionCode/versionName for every release and build with `cap sync android` then `./gradlew assembleDebug` (debug uses the shared key), so phones update in place.

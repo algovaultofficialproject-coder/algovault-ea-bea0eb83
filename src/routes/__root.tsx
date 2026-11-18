@@ -4,14 +4,35 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { reportLovableError } from "../lib/lovable-error-reporting";
+
+import "@fontsource/bebas-neue/400.css";
+import "@fontsource/space-mono/400.css";
+import "@fontsource/space-mono/700.css";
+import "@fontsource/jetbrains-mono/400.css";
+import "@fontsource/jetbrains-mono/700.css";
+
+import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
+import { useApplyTheme } from "@/lib/portal-store";
+import { initNativeOverlay } from "@/lib/native-overlay";
+import { SITE_THEME_BOOT_SCRIPT, siteThemeAppliesTo } from "@/lib/site-theme";
+
+/** Glitch typography is reserved for the landing page. */
+function usePortalTypography() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (pathname === "/") document.documentElement.dataset.portal = "glitch";
+    else delete document.documentElement.dataset.portal;
+  }, [pathname]);
+}
 
 function NotFoundComponent() {
   return (
@@ -75,27 +96,32 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
-    // Replace these placeholders with the app's name and description when first building the app.
-    // Each content route, / included, must still set its own head(). Never add og:image or
-    // twitter:image here: every page without its own would inherit the root's preview image.
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Algo Vault EA — Host Your PC Bot as a Mobile EA" },
+      { name: "description", content: "The best mobile EA hosting platform. Host your PC trading bot and let clients copy from their phone — no VPS needed, any broker." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Algo Vault EA — Host Your PC Bot as a Mobile EA" },
+      { property: "og:description", content: "The best mobile EA hosting platform. Host your PC trading bot and let clients copy from their phone — no VPS needed, any broker." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Algo Vault EA — Host Your PC Bot as a Mobile EA" },
+      { name: "twitter:description", content: "The best mobile EA hosting platform. Host your PC trading bot and let clients copy from their phone — no VPS needed, any broker." },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "stylesheet", href: appCss },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Rubik+Glitch&family=Audiowide&family=Racing+Sans+One&family=Exo+2:ital,wght@1,800&family=Titillium+Web:ital,wght@1,700&family=Orbitron:wght@800&family=Anton&display=swap" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.jpg" },
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
+    ],
+    scripts: [
+      { children: SITE_THEME_BOOT_SCRIPT },
+      { children: `if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}` },
     ],
   }),
   shellComponent: RootShell,
@@ -104,9 +130,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
-function RootShell({ children }: { children: ReactNode }) {
+function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
@@ -120,11 +146,19 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const mentorPage = pathname !== "/" && pathname !== "/ios" && pathname !== "/android" && pathname !== "/fundamentals";
+  const siteThemed = siteThemeAppliesTo(pathname);
+  useApplyTheme();
+  usePortalTypography();
+  // Android app: connects the floating bot circle and Trade Log (no-op on the website).
+  useEffect(() => { void initNativeOverlay(); }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className={[mentorPage && "mentor-theme min-h-screen", siteThemed && "site-themed"].filter(Boolean).join(" ") || undefined}>
+        <Outlet />
+      </div>
     </QueryClientProvider>
   );
 }

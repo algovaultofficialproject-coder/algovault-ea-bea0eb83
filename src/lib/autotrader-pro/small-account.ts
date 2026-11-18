@@ -1,8 +1,8 @@
 /**
  * Pure small-account growth plan (e.g. R200 → bigger): growth tiers by balance, risk-based lot sizing from
- * the user-entered balance (never read from the broker), and a quality-grade gate per tier.
+ * the user-entered balance (never read from the broker), and only a failing (C) grade is skipped.
  */
-import { GRADE_RANK, type QualityGrade } from "./momentum";
+import { FAILING_GRADE, type QualityGrade } from "./momentum";
 
 export type AccountCurrency = "ZAR" | "USD";
 /** Approximate rand per US dollar, used only to place a rand balance in a tier and size risk. */
@@ -10,14 +10,14 @@ export const ZAR_PER_USD = 18.5;
 /** Approximate yen per dollar for JPY-quoted crosses. */
 const JPY_PER_USD = 150;
 
-export interface GrowthTier { id: string; name: string; minUsd: number; riskPct: number; maxTrades: number; minGrade: QualityGrade }
+export interface GrowthTier { id: string; name: string; minUsd: number; riskPct: number; maxTrades: number }
 export const GROWTH_TIERS: GrowthTier[] = [
-  { id: "seed", name: "Seed", minUsd: 0, riskPct: 5, maxTrades: 1, minGrade: "A+" },
-  { id: "sprout", name: "Sprout", minUsd: 30, riskPct: 4, maxTrades: 1, minGrade: "A+" },
-  { id: "builder", name: "Builder", minUsd: 100, riskPct: 3, maxTrades: 2, minGrade: "A" },
-  { id: "growth", name: "Growth", minUsd: 300, riskPct: 2, maxTrades: 3, minGrade: "A" },
-  { id: "scale", name: "Scale", minUsd: 1000, riskPct: 1.5, maxTrades: 5, minGrade: "B" },
-  { id: "pro", name: "Pro", minUsd: 5000, riskPct: 1, maxTrades: 10, minGrade: "B" },
+  { id: "seed", name: "Seed", minUsd: 0, riskPct: 5, maxTrades: 1 },
+  { id: "sprout", name: "Sprout", minUsd: 30, riskPct: 4, maxTrades: 1 },
+  { id: "builder", name: "Builder", minUsd: 100, riskPct: 3, maxTrades: 2 },
+  { id: "growth", name: "Growth", minUsd: 300, riskPct: 2, maxTrades: 3 },
+  { id: "scale", name: "Scale", minUsd: 1000, riskPct: 1.5, maxTrades: 5 },
+  { id: "pro", name: "Pro", minUsd: 5000, riskPct: 1, maxTrades: 10 },
 ];
 /** A minimum-lot trade may risk up to this multiple of the tier risk before it is skipped. */
 export const MIN_LOT_RISK_MULT = 2;
@@ -69,13 +69,12 @@ export type SmallAccountSize =
   | { ok: true; lot: number; trades: number; riskAmount: number; riskPct: number; tier: GrowthTier; note: string }
   | { ok: false; reason: string; tier: GrowthTier };
 
-/** Pure: lot and trade count for a small account; skips signals below the tier's grade or too risky at the minimum lot. */
+/** Pure: lot and trade count for a small account; skips failing (C) signals or ones too risky at the minimum lot. */
 export function sizeSmallAccount(x: SmallAccountInput): SmallAccountSize {
   const tier = tierFor(x.balance, x.currency);
   const money = (usd: number) => `${x.currency === "ZAR" ? "R" : "$"}${fromUsd(usd, x.currency).toFixed(2)}`;
   if (!(x.balance > 0)) return { ok: false, reason: "enter your account balance in Settings → Small Account Growth", tier };
-  const grade = x.grade ?? "B";
-  if (GRADE_RANK[grade] < GRADE_RANK[tier.minGrade]) return { ok: false, reason: `${tier.name} tier only takes ${tier.minGrade} signals (this one is ${grade}) — protecting the account`, tier };
+  if (x.grade === FAILING_GRADE) return { ok: false, reason: "signal failed the momentum check (grade C) — waiting", tier };
   const balUsd = toUsd(x.balance, x.currency);
   const budget = (balUsd * tier.riskPct) / 100;
   const perMin = (lossPerLotUsd(x.symbol, x.entry, x.stop) * 0.01) / (x.cent ? 100 : 1);

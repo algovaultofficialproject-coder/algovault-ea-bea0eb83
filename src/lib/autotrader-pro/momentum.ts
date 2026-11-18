@@ -8,6 +8,8 @@ import type { Interval, Side } from "./types";
 
 export type MomentumPhase = "building" | "strong" | "fading" | "flat";
 export type QualityGrade = "A+" | "A" | "B" | "C";
+/** Only a failing grade is rejected: the robot WAITs on C and trades A+, A and B. */
+export const FAILING_GRADE: QualityGrade = "C";
 export const GRADE_RANK: Record<QualityGrade, number> = { "A+": 3, A: 2, B: 1, C: 0 };
 
 export interface MomentumShift { toward: Side; probability: number; evidence: string[] }
@@ -21,6 +23,8 @@ export interface MomentumRead {
   /** Likely next momentum shift (probability 30–95), if any. */
   shift?: MomentumShift;
   text: string;
+  /** True when the closed candle had too little data to read; such frames never count for or against a grade. */
+  noData?: boolean;
 }
 
 const ok = (...n: number[]) => n.every((x) => Number.isFinite(x));
@@ -32,7 +36,7 @@ export function readMomentum(s: Series, i: number, interval?: Interval): Momentu
   const a = s.atr[i];
   const tf = interval ? `${interval} ` : "";
   if (i < 30 || !(a > 0) || !ok(s.closes[i], s.closes[i - 5], s.macdHist[i], s.macdHist[i - 3], s.rsi[i])) {
-    return { interval, dir: 0, strength: 0, phase: "flat", text: `${tf}momentum: not enough data` };
+    return { interval, dir: 0, strength: 0, phase: "flat", noData: true, text: `${tf}momentum: not enough data` };
   }
   const roc = (s.closes[i] - s.closes[i - 5]) / a;
   const hist = s.macdHist[i] / a;
@@ -90,13 +94,14 @@ export interface MomentumQuality { grade: QualityGrade; delta: number; notes: st
 
 /**
  * Pure: grade a BUY/SELL against current momentum (5m + 15m lead, 1m times) and the next-shift risk.
- * A+ both lead frames push with it, nothing turning against it; C fights momentum or a likely shift.
+ * A+ both lead frames push with it, nothing turning against it; C (failing) fights momentum or a likely shift.
  */
 export function momentumQuality(side: Side, reads: MomentumRead[]): MomentumQuality {
   const d = side === "BUY" ? 1 : -1;
   const of = (iv: Interval) => reads.find((r) => r.interval === iv);
-  const lead = [of("5m"), of("15m")].filter((r): r is MomentumRead => !!r);
-  const m1 = of("1m");
+  const lead = [of("5m"), of("15m")].filter((r): r is MomentumRead => !!r && !r.noData);
+  const m1raw = of("1m");
+  const m1 = m1raw?.noData ? undefined : m1raw;
   const notes: string[] = [];
   const aligned = lead.filter((r) => r.dir === d).length;
   const against = lead.filter((r) => r.dir === -d).length;
@@ -108,7 +113,8 @@ export function momentumQuality(side: Side, reads: MomentumRead[]): MomentumQual
   if (lead.length >= 2 && aligned === 2 && shiftAgainst < 50 && !m1Against && !fading15) grade = "A+";
   else if ((aligned === 2 && shiftAgainst < 60) || (aligned >= 1 && against === 0 && shiftFor >= 50)) grade = "A";
   else if (aligned >= 1 && (shiftAgainst < 60 || aligned === 2)) grade = "B";
-  else if (aligned === 0 && against === 0 && shiftFor >= 50) grade = "B";
+  // Neutral lead momentum (flat / unreadable, nothing pushing against) is a normal B, not a failure.
+  else if (aligned === 0 && against === 0 && shiftAgainst < 60) grade = "B";
   else grade = "C";
   if (aligned === 2) notes.push(`5m + 15m momentum push ${side}`);
   else if (aligned === 1) notes.push(`One lead frame pushes ${side}`);

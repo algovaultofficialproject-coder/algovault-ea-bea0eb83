@@ -14,7 +14,7 @@ import { planTpSl, tpslFor, type TpSlPlan } from "./tpsl";
 import type { FrameSmc } from "./mtf";
 import { refereeAction, type GeminiVerdict } from "./gemini-referee";
 import { bookMode, isBreakout } from "./strategy-book";
-import { momentumQuality, readMomentum, type MomentumRead, type QualityGrade } from "./momentum";
+import { FAILING_GRADE, momentumQuality, readMomentum, type MomentumRead, type QualityGrade } from "./momentum";
 
 /** Pure: apply the TP/SL engine to a directional decision: structure + ATR stop and one average structure-based target. */
 import { DEFAULT_TARGET_RR, MAX_TARGET_RR, MIN_TARGET_RR } from "./target-band";
@@ -152,11 +152,12 @@ export async function scanProSignal(symbol: string, candlesFn: CandlesFn, now = 
   return withMomentum(withTpSl(out, plan(out.side, out.entry)), frames.map((f) => f.momentum));
 }
 
-/** Pure: grade a signal by current momentum and next-shift risk (A+…C), adjusting confidence and explaining why. */
+/** Pure: grade a signal on the latest closed candles (A+…C); a failing C becomes WAIT, A+/A/B adjust confidence and trade. */
 export function withMomentum(sig: ProSignal, reads: MomentumRead[]): ProSignal {
   if (!sig.ok || sig.side === "WAIT" || reads.length === 0) return sig;
   const q = momentumQuality(sig.side, reads);
   const momentum = reads.map((r) => r.text).join(" · ");
+  if (q.grade === FAILING_GRADE) return { ok: true, side: "WAIT", reason: `${sig.side} ${sig.interval} setup failed the momentum check (grade C)${q.notes.length ? `: ${q.notes.join("; ")}` : ""} — waiting for the next candle` };
   const confidence = Math.max(5, Math.min(95, sig.confidence + q.delta));
   return { ...sig, confidence, grade: q.grade, momentum, reason: `${sig.reason} · Quality ${q.grade}${q.notes.length ? `: ${q.notes.join("; ")}` : ""}` };
 }

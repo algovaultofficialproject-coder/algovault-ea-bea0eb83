@@ -102,7 +102,7 @@ export function useAutoScalp({ eaId, eaName, login, password, server, enabled }:
           let lot = Math.max(0.01, Number(s.lotSize) || 0.01);
           let count = Math.max(1, Math.min(20, parseInt(String(s.trades ?? "1"), 10) || 1));
           let reason = sig.reason;
-          // Small Account Growth (opt-in): lot and trade count from the typed balance, only the tier's signal grade.
+          // Small Account Growth (opt-in): lot and trade count from the typed balance, failing (C) signals wait.
           const sa = smallAccount.get();
           if (sa.on) {
             const r = sizeSmallAccount({ symbol: s.symbol, entry: price, stop: sl, balance: Number(sa.balance) || 0, currency: sa.currency, cent: sa.cent, pairLot: lot, pairTrades: count, grade: sig.grade });

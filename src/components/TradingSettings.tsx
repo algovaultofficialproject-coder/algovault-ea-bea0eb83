@@ -202,7 +202,7 @@ function SmallAccountPanel({ sa }: { sa: ReturnType<typeof useSmallAccount> }) {
   const sym = sa.currency === "ZAR" ? "R" : "$";
   return (
     <>
-      <ToggleCard emoji="🌱" label="Grow a small account" sub="Robot sizes lots from your balance and only takes top-quality momentum signals" on={sa.on} onToggle={() => smallAccount.set({ on: !sa.on })} />
+      <ToggleCard emoji="🌱" label="Grow a small account" sub="Robot sizes lots from your balance and waits only when a signal fails the momentum check" on={sa.on} onToggle={() => smallAccount.set({ on: !sa.on })} />
       <p className="settings-sub-label">Account balance</p>
       <div className="flex items-center gap-2">
         <div className="settings-pill-group" role="radiogroup" aria-label="Currency">
@@ -215,7 +215,7 @@ function SmallAccountPanel({ sa }: { sa: ReturnType<typeof useSmallAccount> }) {
       <ToggleCard emoji="🪙" label="Cent account" sub="Turn on if your broker account is a cent account (best for balances under R1 000)" on={sa.cent} onToggle={() => smallAccount.set({ cent: !sa.cent })} />
       {bal > 0 && (
         <div className="settings-check-progress">
-          <span>{plan.tier.name} tier · risk {plan.tier.riskPct}% · up to {plan.tier.maxTrades} trade{plan.tier.maxTrades > 1 ? "s" : ""} · {plan.tier.minGrade}+ signals only</span>
+          <span>{plan.tier.name} tier · risk {plan.tier.riskPct}% · up to {plan.tier.maxTrades} trade{plan.tier.maxTrades > 1 ? "s" : ""} · A+, A and B signals</span>
           <span>Next goal {sym}{plan.target.toLocaleString()}{plan.next ? ` (${plan.next.name})` : " (double up)"}</span>
           <span className="settings-check-bar"><span style={{ width: `${plan.progress * 100}%` }} /></span>
         </div>

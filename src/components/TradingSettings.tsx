@@ -202,6 +202,8 @@ function SmallAccountPanel({ sa }: { sa: ReturnType<typeof useSmallAccount> }) {
   const sym = sa.currency === "ZAR" ? "R" : "$";
   return (
     <>
+      <ToggleCard emoji="🛡️" label="Loss limit per signal" sub={`All trades of one signal together lose at most ${sym}${sa.maxLoss || "0"} if the stop is hit — the robot lowers the lot or waits`} on={sa.lossCap} onToggle={() => smallAccount.set({ lossCap: !sa.lossCap })} />
+      {sa.lossCap && <Input inputMode="decimal" aria-label="Maximum loss per signal" value={sa.maxLoss} onChange={(e) => smallAccount.set({ maxLoss: e.target.value.replace(/[^0-9.]/g, "") })} />}
       <ToggleCard emoji="🌱" label="Grow a small account" sub="Robot sizes lots from your balance and waits only when a signal fails the momentum check" on={sa.on} onToggle={() => smallAccount.set({ on: !sa.on })} />
       <p className="settings-sub-label">Account balance</p>
       <div className="flex items-center gap-2">

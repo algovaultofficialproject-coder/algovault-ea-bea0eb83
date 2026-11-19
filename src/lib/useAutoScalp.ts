@@ -10,6 +10,7 @@ import { usePortalStore } from "@/lib/portal-store";
 import { emailSignal } from "@/lib/signal-email.functions";
 import { scanProSignal, type CandlesFn } from "@/lib/autotrader-pro/pro-signal";
 import { sizeSmallAccount } from "@/lib/autotrader-pro/small-account";
+import { capLoss } from "@/lib/autotrader-pro/loss-cap";
 import { smallAccount } from "@/lib/small-account-prefs";
 import { loadRobotProState } from "@/lib/autotrader-pro/shared-config-client";
 
@@ -117,6 +118,21 @@ export function useAutoScalp({ eaId, eaName, login, password, server, enabled }:
               continue;
             }
             lot = r.lot; count = r.trades; reason = `${r.note} · ${reason}`;
+          }
+          // Loss limit (default R100): all trades of this signal together never lose more than the limit at the stop.
+          if (sa.lossCap && Number(sa.maxLoss) > 0) {
+            const c = capLoss({ symbol: s.symbol, entry: price, stop: sl, lot, trades: count, maxLoss: Number(sa.maxLoss), currency: sa.currency, cent: sa.cent });
+            if (!c.ok) {
+              const why = `Loss limit: ${c.reason}`;
+              const last = waitLogged.get(s.symbol);
+              if (!last || last.reason !== why || Date.now() - last.at >= WAIT_RELOG_MS) {
+                waitLogged.set(s.symbol, { at: Date.now(), reason: why });
+                tradeLog.wait({ symbol: s.symbol, reason: why });
+                tradeLog.scanning();
+              }
+              continue;
+            }
+            lot = c.lot; count = c.trades; reason = `${c.note} · ${reason}`;
           }
           // One stop loss and one take profit for every trade: the AutoTrader Pro market-based plan.
           const groups = [{ count, tpDist }];

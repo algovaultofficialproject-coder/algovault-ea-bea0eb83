@@ -14,6 +14,7 @@ import { planTpSl, tpslFor, type TpSlPlan } from "./tpsl";
 import type { FrameSmc } from "./mtf";
 import { refereeAction, type GeminiVerdict } from "./gemini-referee";
 import { bookMode, isBreakout } from "./strategy-book";
+import { fitsSymbol } from "./symbol-fit";
 import { FAILING_GRADE, momentumQuality, readMomentum, type MomentumRead, type QualityGrade } from "./momentum";
 
 /** Pure: apply the TP/SL engine to a directional decision: structure + ATR stop and one average structure-based target. */
@@ -85,17 +86,17 @@ function aligned(sig: ProSignal, frames: { interval: Interval; result: ScanResul
   return { ...sig, confidence: Math.min(95, sig.confidence + ALIGN_BONUS), reason: `${sig.reason} · 1m, 5m and 15m aligned` };
 }
 
-export function proDecision(chosen: { interval: Interval; result: ScanResult } | undefined, frames: { interval: Interval; result: ScanResult }[] = chosen ? [chosen] : []): ProSignal {
+export function proDecision(chosen: { interval: Interval; result: ScanResult } | undefined, frames: { interval: Interval; result: ScanResult }[] = chosen ? [chosen] : [], fits: (s: Signal) => boolean = () => true): ProSignal {
   const all: { sig: Signal; interval: Interval; w: number }[] = [];
   for (const f of frames) {
     const seen = new Set<string>();
     for (const sig of [f.result.best, ...f.result.early, ...f.result.candidates]) {
-      if (!sig || seen.has(sig.id) || (sig.side !== "BUY" && sig.side !== "SELL")) continue;
+      if (!sig || seen.has(sig.id) || (sig.side !== "BUY" && sig.side !== "SELL") || !fits(sig)) continue;
       seen.add(sig.id);
       all.push({ sig, interval: f.interval, w: TF_WEIGHT[f.interval] ?? 1 });
     }
   }
-  const best = chosen?.result.best;
+  const best = chosen?.result.best && fits(chosen.result.best) ? chosen.result.best : undefined;
   if (all.length === 0) {
     if (chosen && best && best.stage === "confirmed") return toSignal(best, chosen.interval, false);
     return { ok: true, side: "WAIT", reason: chosen ? chosen.result.conflict ?? chosen.result.summary : "No timeframe has a setup yet" };
@@ -141,7 +142,7 @@ export async function scanProSignal(symbol: string, candlesFn: CandlesFn, now = 
   }))).filter((f): f is { interval: Interval; result: ScanResult; smc: FrameSmc; spread: number | undefined; momentum: MomentumRead } => !!f);
   if (frames.length === 0) return { ok: false, error: lastError };
   const chosen = pickTimeframe(frames);
-  const sig = proDecision(chosen, frames);
+  const sig = proDecision(chosen, frames, (x) => fitsSymbol(symbol, x));
   if (!sig.ok) return sig;
   const plan = (side: Side, entry?: number) => { try { return planTpSl(side, frames.map((f) => f.smc), tpslFor(symbol, pro.tpsl, pro.tpslByMarket), entry); } catch { return undefined; } };
   const verdict = referee ? await referee(symbol).catch(() => null) : null;

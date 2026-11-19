@@ -9,7 +9,6 @@ import { tradeLog } from "@/lib/trade-log";
 import { usePortalStore } from "@/lib/portal-store";
 import { emailSignal } from "@/lib/signal-email.functions";
 import { scanProSignal, type CandlesFn } from "@/lib/autotrader-pro/pro-signal";
-import { sizeSmallAccount } from "@/lib/autotrader-pro/small-account";
 import { capLoss } from "@/lib/autotrader-pro/loss-cap";
 import { smallAccount } from "@/lib/small-account-prefs";
 import { loadRobotProState } from "@/lib/autotrader-pro/shared-config-client";
@@ -103,22 +102,7 @@ export function useAutoScalp({ eaId, eaName, login, password, server, enabled }:
           let lot = Math.max(0.01, Number(s.lotSize) || 0.01);
           let count = Math.max(1, Math.min(20, parseInt(String(s.trades ?? "1"), 10) || 1));
           let reason = sig.reason;
-          // Small Account Growth (opt-in): lot and trade count from the typed balance, failing (C) signals wait.
           const sa = smallAccount.get();
-          if (sa.on) {
-            const r = sizeSmallAccount({ symbol: s.symbol, entry: price, stop: sl, balance: Number(sa.balance) || 0, currency: sa.currency, cent: sa.cent, pairLot: lot, pairTrades: count, grade: sig.grade });
-            if (!r.ok) {
-              const why = `Small account (${r.tier.name}): ${r.reason}`;
-              const last = waitLogged.get(s.symbol);
-              if (!last || last.reason !== why || Date.now() - last.at >= WAIT_RELOG_MS) {
-                waitLogged.set(s.symbol, { at: Date.now(), reason: why });
-                tradeLog.wait({ symbol: s.symbol, reason: why });
-                tradeLog.scanning();
-              }
-              continue;
-            }
-            lot = r.lot; count = r.trades; reason = `${r.note} · ${reason}`;
-          }
           // Loss limit (default R100): all trades of this signal together never lose more than the limit at the stop.
           if (sa.lossCap && Number(sa.maxLoss) > 0) {
             const c = capLoss({ symbol: s.symbol, entry: price, stop: sl, lot, trades: count, maxLoss: Number(sa.maxLoss), currency: sa.currency, cent: sa.cent });

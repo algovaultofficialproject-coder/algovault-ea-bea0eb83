@@ -1,10 +1,10 @@
 import { useSyncExternalStore } from "react";
-import type { AccountCurrency } from "@/lib/autotrader-pro/small-account";
+import type { AccountCurrency } from "@/lib/autotrader-pro/loss-cap";
 
-/** Device-local small-account growth settings (the balance is typed by the user, never read from the broker). */
-export interface SmallAccountPrefs { on: boolean; balance: string; currency: AccountCurrency; cent: boolean; lossCap: boolean; maxLoss: string }
+/** Device-local loss-limit settings (typed by the user, never read from the broker). */
+export interface SmallAccountPrefs { currency: AccountCurrency; cent: boolean; lossCap: boolean; maxLoss: string }
 const KEY = "algovault-small-account";
-const DEFAULTS: SmallAccountPrefs = { on: false, balance: "200", currency: "ZAR", cent: false, lossCap: true, maxLoss: "100" };
+const DEFAULTS: SmallAccountPrefs = { currency: "ZAR", cent: false, lossCap: true, maxLoss: "100" };
 let state: SmallAccountPrefs | null = null;
 const listeners = new Set<() => void>();
 

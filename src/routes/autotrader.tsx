@@ -13,6 +13,7 @@ import { TpSlSettingsPanel } from "@/components/autotrader/TpSlPanel";
 import { TradesPanel } from "@/components/autotrader/TradesPanel";
 import { PerformancePanel } from "@/components/autotrader/PerformancePanel";
 import { ProSettings } from "@/components/autotrader/ProSettings";
+import { StrategyLibraryPanel } from "@/components/autotrader/StrategyLibraryPanel";
 import { ScannerBoard } from "@/components/autotrader/ScannerBoard";
 import { DEFAULT_WATCHLIST } from "@/lib/autotrader-pro/scanner-board";
 import { sideTone } from "@/components/autotrader/ui-bits";
@@ -182,7 +183,7 @@ function Dashboard() {
           <TabsContent value="board" className="mt-3"><ScannerBoard scans={scans} symbols={pro.symbols} now={now} onMarket={executeSignal} /></TabsContent>
           <TabsContent value="scan" className="mt-3 space-y-3"><MarketChangePanel scan={scans[focusSym]} now={now} /><MtfPanel scan={scans[focusSym]} now={now} /><MarketPanel scan={scans[focusSym]} now={now} onExecute={executeSignal} /></TabsContent>
           <TabsContent value="trades" className="mt-3"><TradesPanel scans={scans} now={now} /></TabsContent>
-          <TabsContent value="perf" className="mt-3 space-y-3"><PerformancePanel symbol={focusSym} runBacktest={runBacktest} /><TpSlSettingsPanel /></TabsContent>
+          <TabsContent value="perf" className="mt-3 space-y-3"><PerformancePanel symbol={focusSym} runBacktest={runBacktest} /><StrategyLibraryPanel /><TpSlSettingsPanel /></TabsContent>
           <TabsContent value="settings" className="mt-3"><ProSettings /></TabsContent>
         </Tabs>
         <p className="mt-6 text-center text-[11px] text-muted-foreground">Price history: Coinbase Exchange (crypto) and Yahoo Finance free feed (forex, gold & indices; Twelve Data if a key is added). TradingView's public technical rating is shown as a cross-check. Signals are analysis, not financial advice.</p>

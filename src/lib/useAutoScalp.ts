@@ -103,9 +103,9 @@ export function useAutoScalp({ eaId, eaName, login, password, server, enabled }:
           let count = Math.max(1, Math.min(20, parseInt(String(s.trades ?? "1"), 10) || 1));
           let reason = sig.reason;
           const sa = smallAccount.get();
-          // Loss limit (default R100): all trades of this signal together never lose more than the limit at the stop.
-          if (sa.lossCap && Number(sa.maxLoss) > 0) {
-            const c = capLoss({ symbol: s.symbol, entry: price, stop: sl, lot, trades: count, maxLoss: Number(sa.maxLoss), currency: sa.currency, cent: sa.cent });
+          // Loss limit (default R100, never above the strict R120 ceiling): all trades of this signal together stay inside it at the stop.
+          {
+            const c = capLoss({ symbol: s.symbol, entry: price, stop: sl, lot, trades: count, maxLoss: sa.lossCap ? Number(sa.maxLoss) || 0 : 0, currency: sa.currency, cent: sa.cent });
             if (!c.ok) {
               const why = `Loss limit: ${c.reason}`;
               const last = waitLogged.get(s.symbol);

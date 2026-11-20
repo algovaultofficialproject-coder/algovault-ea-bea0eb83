@@ -8,7 +8,7 @@ import type { Interval, Side } from "./types";
 
 export type MomentumPhase = "building" | "strong" | "fading" | "flat";
 export type QualityGrade = "A+" | "A" | "B" | "C";
-/** Only a failing grade is rejected: the robot WAITs on C and trades A+, A and B. */
+/** The weakest grade: it still trades (no WAIT), with lower confidence. */
 export const FAILING_GRADE: QualityGrade = "C";
 export const GRADE_RANK: Record<QualityGrade, number> = { "A+": 3, A: 2, B: 1, C: 0 };
 
@@ -163,7 +163,7 @@ export function momentumQuality(side: Side, reads: MomentumRead[]): MomentumQual
   if (shiftAgainst >= 50) notes.push(`Warning: momentum may shift against ${side} (${shiftAgainst}%)`);
   if (fading15) notes.push("15m momentum fading");
   if (m1Against) notes.push("1m still against — timing not ideal");
-  // 1m + 5m change detection: a confirmed change toward the signal lifts it to A; one against it steps the grade down (confirmed → C/WAIT).
+  // 1m + 5m change detection: a confirmed change toward the signal lifts it to A; one against it steps the grade down (confirmed → C, lower confidence).
   const change = readDirectionChange(reads);
   if (change && change.toward === side) {
     if (change.stage === "confirmed" && shiftAgainst < 60 && GRADE_RANK[grade] < GRADE_RANK.A) grade = "A";

@@ -27,9 +27,10 @@ export function biasSide(frames: BiasFrame[], prefer?: Side): { side: Side; scor
   return { side: score > 0 ? "BUY" : "SELL", score };
 }
 
-export function biasSignal(frames: BiasFrame[], why: string, plan?: (side: Side) => BiasPlan | undefined, prefer?: Side): BiasSignal | null {
+export function biasSignal(frames: BiasFrame[], why: string, plan?: (side: Side) => BiasPlan | undefined, prefer?: Side, force?: Side): BiasSignal | null {
   if (frames.length === 0) return null;
-  const { side, score } = biasSide(frames, prefer);
+  const lean = biasSide(frames, prefer);
+  const side = force ?? lean.side, score = lean.score;
   const anchor = frames.find((f) => f.interval === "1m") ?? frames.find((f) => f.interval === "5m") ?? frames[0];
   const f15 = frames.find((f) => f.interval === "15m") ?? anchor;
   const entry = anchor.price, atr15 = ok(f15.atr) ? f15.atr : anchor.atr, d = side === "BUY" ? 1 : -1;

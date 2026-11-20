@@ -15,7 +15,10 @@ import type { FrameSmc } from "./mtf";
 import { refereeAction, type GeminiVerdict } from "./gemini-referee";
 import { bookMode, isBreakout } from "./strategy-book";
 import { fitsSymbol } from "./symbol-fit";
-import { FAILING_GRADE, momentumQuality, readMomentum, type MomentumRead, type QualityGrade } from "./momentum";
+import { momentumQuality, readMomentum, type MomentumRead, type QualityGrade } from "./momentum";
+import { biasSignal } from "./bias-signal";
+import { directionScores, type DirectionScores } from "./direction";
+import type { Series } from "./indicators";
 
 /** Pure: apply the TP/SL engine to a directional decision: structure + ATR stop and one average structure-based target. */
 import { DEFAULT_TARGET_RR, MAX_TARGET_RR, MIN_TARGET_RR } from "./target-band";
@@ -57,7 +60,7 @@ export function withTpSl(sig: ProSignal, plan: TpSlPlan | undefined): ProSignal 
 }
 
 export type ProSignal =
-  | { ok: true; side: Side; id: string; interval: Interval; entry: number; stopLoss: number; takeProfit: number; confidence: number; strategy: string; reason: string; confirmed?: boolean; mode?: "trend" | "range" | "transition"; breakout?: boolean; grade?: QualityGrade; momentum?: string }
+  | { ok: true; side: Side; id: string; interval: Interval; entry: number; stopLoss: number; takeProfit: number; confidence: number; strategy: string; reason: string; confirmed?: boolean; mode?: "trend" | "range" | "transition"; breakout?: boolean; grade?: QualityGrade; momentum?: string; scores?: DirectionScores }
   | { ok: true; side: "WAIT"; reason: string }
   | { ok: false; error: string };
 
@@ -138,27 +141,42 @@ export async function scanProSignal(symbol: string, candlesFn: CandlesFn, now = 
       ctx: { spreadAtr: feed.spread !== undefined && atrNow > 0 ? feed.spread / atrNow : undefined },
     });
     const smc: FrameSmc = { interval, smc: readSmc(series, i), price: feed.candles[i].c, atr: atrNow, volatility: result.market.volatility };
-    return { interval, result, smc, spread: feed.spread, momentum: readMomentum(series, i, interval) };
-  }))).filter((f): f is { interval: Interval; result: ScanResult; smc: FrameSmc; spread: number | undefined; momentum: MomentumRead } => !!f);
+    return { interval, result, smc, series, i, spread: feed.spread, momentum: readMomentum(series, i, interval) };
+  }))).filter((f): f is { interval: Interval; result: ScanResult; smc: FrameSmc; series: Series; i: number; spread: number | undefined; momentum: MomentumRead } => !!f);
   if (frames.length === 0) return { ok: false, error: lastError };
   const chosen = pickTimeframe(frames);
-  const sig = proDecision(chosen, frames, (x) => fitsSymbol(symbol, x));
-  if (!sig.ok) return sig;
   const plan = (side: Side, entry?: number) => { try { return planTpSl(side, frames.map((f) => f.smc), tpslFor(symbol, pro.tpsl, pro.tpslByMarket), entry); } catch { return undefined; } };
+  const scores = directionScores(frames.map((f) => ({ interval: f.interval, series: f.series, i: f.i, smc: f.smc.smc })));
+  const first = proDecision(chosen, frames, (x) => fitsSymbol(symbol, x));
+  if (!first.ok) return first;
+  // No WAIT: without a strategy setup the 1m/5m/15m direction scores choose BUY or SELL, with the shared stop/target plan.
+  const sig = first.side === "WAIT" ? noWait(first.reason, frames, scores, plan) ?? first : first;
+  if (!sig.ok) return sig;
   const verdict = referee ? await referee(symbol).catch(() => null) : null;
   const act = refereeAction(sig.side, verdict);
-  // The trading-app robot follows AutoTrader Pro: Gemini can only add confidence when it agrees, never turn a Pro signal into WAIT.
+  // Gemini can only add confidence when it agrees, never turn a Pro signal into WAIT.
   if (sig.side === "WAIT") return sig;
   const out = act === "agree" && verdict ? { ...sig, confidence: Math.min(95, sig.confidence + 5), reason: `${sig.reason} · Gemini agrees: ${verdict.reason}` } : sig;
-  return withMomentum(withTpSl(out, plan(out.side, out.entry)), frames.map((f) => f.momentum));
+  const graded = withMomentum(withTpSl(out, plan(out.side, out.entry)), frames.map((f) => f.momentum));
+  return graded.ok && graded.side !== "WAIT" ? { ...graded, scores, reason: `${graded.reason} · ${scores.text}` } : graded;
 }
 
-/** Pure: grade a signal on the latest closed candles (A+…C); a failing C becomes WAIT, A+/A/B adjust confidence and trade. */
+/** Pure: turn a no-setup moment into a direction-score signal (BUY/SELL from the scores, stop/target from the plan). */
+export function noWait(why: string, frames: { interval: Interval; smc: FrameSmc; series: Series; i: number }[], scores: DirectionScores, plan: (side: Side) => TpSlPlan | undefined): ProSignal | null {
+  const b = biasSignal(frames.map((f) => {
+    const c = f.series.candles[f.i];
+    return { interval: f.interval, bias: f.smc.smc.bias, price: f.smc.price, ema21: f.series.ema21[f.i], ema50: f.series.ema50[f.i], atr: f.smc.atr, lastUp: !!c && c.c >= c.o };
+  }), why, (side) => plan(side), scores.side, scores.side);
+  if (!b) return null;
+  const top = (scores.side === "BUY" ? scores.why.buy : scores.why.sell).slice(0, 4).join("; ");
+  return { ...b, strategy: "Direction Scores", reason: `${b.side} on direction scores (${scores.side === "BUY" ? scores.buy : scores.sell}/100)${top ? `: ${top}` : ""} · no strategy setup (${why.slice(0, 80)})` };
+}
+
+/** Pure: grade a signal on the latest closed candles (A+…C); every grade trades, the grade only adjusts confidence. */
 export function withMomentum(sig: ProSignal, reads: MomentumRead[]): ProSignal {
   if (!sig.ok || sig.side === "WAIT" || reads.length === 0) return sig;
   const q = momentumQuality(sig.side, reads);
   const momentum = reads.map((r) => r.text).join(" · ");
-  if (q.grade === FAILING_GRADE) return { ok: true, side: "WAIT", reason: `${sig.side} ${sig.interval} setup failed the momentum check (grade C)${q.notes.length ? `: ${q.notes.join("; ")}` : ""} — waiting for the next candle` };
   const confidence = Math.max(5, Math.min(95, sig.confidence + q.delta));
   return { ...sig, confidence, grade: q.grade, momentum, reason: `${sig.reason} · Quality ${q.grade}${q.notes.length ? `: ${q.notes.join("; ")}` : ""}` };
 }
